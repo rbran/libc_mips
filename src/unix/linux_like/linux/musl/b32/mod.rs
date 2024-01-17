@@ -16,11 +16,11 @@ s! {
     }
 
     pub struct msghdr {
-        pub msg_name: *mut ::c_void,
+        pub msg_name: u32, //*mut ::c_void,
         pub msg_namelen: ::socklen_t,
-        pub msg_iov: *mut ::iovec,
+        pub msg_iov: u32, //*mut ::iovec,
         pub msg_iovlen: ::c_int,
-        pub msg_control: *mut ::c_void,
+        pub msg_control: u32, //*mut ::c_void,
         pub msg_controllen: ::socklen_t,
         pub msg_flags: ::c_int,
     }
@@ -40,26 +40,5 @@ pub const __SIZEOF_PTHREAD_RWLOCK_T: usize = 32;
 pub const __SIZEOF_PTHREAD_MUTEX_T: usize = 24;
 pub const __SIZEOF_PTHREAD_BARRIER_T: usize = 20;
 
-cfg_if! {
-    if #[cfg(any(target_arch = "x86"))] {
-        mod x86;
-        pub use self::x86::*;
-    } else if #[cfg(any(target_arch = "mips"))] {
-        mod mips;
-        pub use self::mips::*;
-    } else if #[cfg(any(target_arch = "arm"))] {
-        mod arm;
-        pub use self::arm::*;
-    } else if #[cfg(any(target_arch = "powerpc"))] {
-        mod powerpc;
-        pub use self::powerpc::*;
-    } else if #[cfg(any(target_arch = "hexagon"))] {
-        mod hexagon;
-        pub use self::hexagon::*;
-    } else if #[cfg(any(target_arch = "riscv32"))] {
-        mod riscv32;
-        pub use self::riscv32::*;
-    } else {
-        // Unknown target_arch
-    }
-}
+mod mips;
+pub use self::mips::*;

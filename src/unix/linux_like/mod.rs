@@ -2,7 +2,7 @@ pub type sa_family_t = u16;
 pub type speed_t = ::c_uint;
 pub type tcflag_t = ::c_uint;
 pub type clockid_t = ::c_int;
-pub type timer_t = *mut ::c_void;
+pub type timer_t = u32; //u32, //*mut ::c_void;
 pub type key_t = ::c_int;
 pub type id_t = ::c_uint;
 
@@ -64,14 +64,14 @@ s! {
 
         #[cfg(any(target_os = "linux",
                   target_os = "emscripten"))]
-        pub ai_addr: *mut ::sockaddr,
+        pub ai_addr: u32, //*mut ::sockaddr,
 
-        pub ai_canonname: *mut c_char,
+        pub ai_canonname: u32, //*mut c_char,
 
         #[cfg(target_os = "android")]
-        pub ai_addr: *mut ::sockaddr,
+        pub ai_addr: u32, //*mut ::sockaddr,
 
-        pub ai_next: *mut addrinfo,
+        pub ai_next: u32, //*mut addrinfo,
     }
 
     pub struct sockaddr_ll {
@@ -99,7 +99,7 @@ s! {
         pub tm_yday: ::c_int,
         pub tm_isdst: ::c_int,
         pub tm_gmtoff: ::c_long,
-        pub tm_zone: *const ::c_char,
+        pub tm_zone: u32, //*const ::c_char,
     }
 
     pub struct sched_param {
@@ -115,23 +115,23 @@ s! {
     }
 
     pub struct Dl_info {
-        pub dli_fname: *const ::c_char,
-        pub dli_fbase: *mut ::c_void,
-        pub dli_sname: *const ::c_char,
-        pub dli_saddr: *mut ::c_void,
+        pub dli_fname: u32, //*const ::c_char,
+        pub dli_fbase: u32, //*mut ::c_void,
+        pub dli_sname: u32, //*const ::c_char,
+        pub dli_saddr: u32, //*mut ::c_void,
     }
 
     pub struct lconv {
-        pub decimal_point: *mut ::c_char,
-        pub thousands_sep: *mut ::c_char,
-        pub grouping: *mut ::c_char,
-        pub int_curr_symbol: *mut ::c_char,
-        pub currency_symbol: *mut ::c_char,
-        pub mon_decimal_point: *mut ::c_char,
-        pub mon_thousands_sep: *mut ::c_char,
-        pub mon_grouping: *mut ::c_char,
-        pub positive_sign: *mut ::c_char,
-        pub negative_sign: *mut ::c_char,
+        pub decimal_point: u32, //*mut ::c_char,
+        pub thousands_sep: u32, //*mut ::c_char,
+        pub grouping: u32, //*mut ::c_char,
+        pub int_curr_symbol: u32, //*mut ::c_char,
+        pub currency_symbol: u32, //*mut ::c_char,
+        pub mon_decimal_point: u32, //*mut ::c_char,
+        pub mon_thousands_sep: u32, //*mut ::c_char,
+        pub mon_grouping: u32, //*mut ::c_char,
+        pub positive_sign: u32, //*mut ::c_char,
+        pub negative_sign: u32, //*mut ::c_char,
         pub int_frac_digits: ::c_char,
         pub frac_digits: ::c_char,
         pub p_cs_precedes: ::c_char,
@@ -155,13 +155,13 @@ s! {
     }
 
     pub struct ifaddrs {
-        pub ifa_next: *mut ifaddrs,
-        pub ifa_name: *mut c_char,
+        pub ifa_next: u32, //*mut ifaddrs,
+        pub ifa_name: u32, //*mut c_char,
         pub ifa_flags: ::c_uint,
-        pub ifa_addr: *mut ::sockaddr,
-        pub ifa_netmask: *mut ::sockaddr,
-        pub ifa_ifu: *mut ::sockaddr, // FIXME This should be a union
-        pub ifa_data: *mut ::c_void
+        pub ifa_addr: u32, //*mut ::sockaddr,
+        pub ifa_netmask: u32, //*mut ::sockaddr,
+        pub ifa_ifu: u32, //*mut ::sockaddr, // FIXME This should be a union
+        pub ifa_data: u32, //*mut ::c_void
     }
 
     pub struct in6_rtmsg {
@@ -227,10 +227,7 @@ s_no_extra_traits! {
 
     pub struct sockaddr_storage {
         pub ss_family: sa_family_t,
-        #[cfg(target_pointer_width = "32")]
         __ss_pad2: [u8; 128 - 2 - 4],
-        #[cfg(target_pointer_width = "64")]
-        __ss_pad2: [u8; 128 - 2 - 8],
         __ss_align: ::size_t,
     }
 
@@ -250,9 +247,6 @@ s_no_extra_traits! {
         // Actually a union.  We only expose sigev_notify_thread_id because it's
         // the most useful member
         pub sigev_notify_thread_id: ::c_int,
-        #[cfg(target_pointer_width = "64")]
-        __unused1: [::c_int; 11],
-        #[cfg(target_pointer_width = "32")]
         __unused1: [::c_int; 12]
     }
 }
@@ -434,15 +428,16 @@ cfg_if! {
 }
 
 // intentionally not public, only used for fd_set
-cfg_if! {
-    if #[cfg(target_pointer_width = "32")] {
-        const ULONG_SIZE: usize = 32;
-    } else if #[cfg(target_pointer_width = "64")] {
-        const ULONG_SIZE: usize = 64;
-    } else {
-        // Unknown target_pointer_width
-    }
-}
+const ULONG_SIZE: usize = 32;
+//cfg_if! {
+//    if #[cfg(target_pointer_width = "32")] {
+//        const ULONG_SIZE: usize = 32;
+//    } else if #[cfg(target_pointer_width = "64")] {
+//        const ULONG_SIZE: usize = 64;
+//    } else {
+//        // Unknown target_pointer_width
+//    }
+//}
 
 pub const EXIT_FAILURE: ::c_int = 1;
 pub const EXIT_SUCCESS: ::c_int = 0;
@@ -599,7 +594,7 @@ pub const MAP_SHARED: ::c_int = 0x0001;
 pub const MAP_PRIVATE: ::c_int = 0x0002;
 pub const MAP_FIXED: ::c_int = 0x0010;
 
-pub const MAP_FAILED: *mut ::c_void = !0 as *mut ::c_void;
+pub const MAP_FAILED: u32 = !0 as u32; //*mut ::c_void = !0 as *mut ::c_void;
 
 // MS_ flags for msync(2)
 pub const MS_ASYNC: ::c_int = 0x0001;
@@ -1290,10 +1285,7 @@ pub const POLLHUP: ::c_short = 0x10;
 pub const POLLNVAL: ::c_short = 0x20;
 pub const POLLRDNORM: ::c_short = 0x040;
 pub const POLLRDBAND: ::c_short = 0x080;
-#[cfg(not(any(target_arch = "sparc", target_arch = "sparc64")))]
 pub const POLLRDHUP: ::c_short = 0x2000;
-#[cfg(any(target_arch = "sparc", target_arch = "sparc64"))]
-pub const POLLRDHUP: ::c_short = 0x800;
 
 pub const IPTOS_LOWDELAY: u8 = 0x10;
 pub const IPTOS_THROUGHPUT: u8 = 0x08;
@@ -1537,363 +1529,5 @@ const_fn! {
     }
 }
 
-f! {
-    pub fn CMSG_FIRSTHDR(mhdr: *const msghdr) -> *mut cmsghdr {
-        if (*mhdr).msg_controllen as usize >= ::mem::size_of::<cmsghdr>() {
-            (*mhdr).msg_control as *mut cmsghdr
-        } else {
-            0 as *mut cmsghdr
-        }
-    }
-
-    pub fn CMSG_DATA(cmsg: *const cmsghdr) -> *mut ::c_uchar {
-        cmsg.offset(1) as *mut ::c_uchar
-    }
-
-    pub {const} fn CMSG_SPACE(length: ::c_uint) -> ::c_uint {
-        (CMSG_ALIGN(length as usize) + CMSG_ALIGN(::mem::size_of::<cmsghdr>()))
-            as ::c_uint
-    }
-
-    pub {const} fn CMSG_LEN(length: ::c_uint) -> ::c_uint {
-        CMSG_ALIGN(::mem::size_of::<cmsghdr>()) as ::c_uint + length
-    }
-
-    pub fn FD_CLR(fd: ::c_int, set: *mut fd_set) -> () {
-        let fd = fd as usize;
-        let size = ::mem::size_of_val(&(*set).fds_bits[0]) * 8;
-        (*set).fds_bits[fd / size] &= !(1 << (fd % size));
-        return
-    }
-
-    pub fn FD_ISSET(fd: ::c_int, set: *const fd_set) -> bool {
-        let fd = fd as usize;
-        let size = ::mem::size_of_val(&(*set).fds_bits[0]) * 8;
-        return ((*set).fds_bits[fd / size] & (1 << (fd % size))) != 0
-    }
-
-    pub fn FD_SET(fd: ::c_int, set: *mut fd_set) -> () {
-        let fd = fd as usize;
-        let size = ::mem::size_of_val(&(*set).fds_bits[0]) * 8;
-        (*set).fds_bits[fd / size] |= 1 << (fd % size);
-        return
-    }
-
-    pub fn FD_ZERO(set: *mut fd_set) -> () {
-        for slot in (*set).fds_bits.iter_mut() {
-            *slot = 0;
-        }
-    }
-}
-
-safe_f! {
-    pub fn SIGRTMAX() -> ::c_int {
-        unsafe { __libc_current_sigrtmax() }
-    }
-
-    pub fn SIGRTMIN() -> ::c_int {
-        unsafe { __libc_current_sigrtmin() }
-    }
-
-    pub {const} fn WIFSTOPPED(status: ::c_int) -> bool {
-        (status & 0xff) == 0x7f
-    }
-
-    pub {const} fn WSTOPSIG(status: ::c_int) -> ::c_int {
-        (status >> 8) & 0xff
-    }
-
-    pub {const} fn WIFCONTINUED(status: ::c_int) -> bool {
-        status == 0xffff
-    }
-
-    pub {const} fn WIFSIGNALED(status: ::c_int) -> bool {
-        ((status & 0x7f) + 1) as i8 >= 2
-    }
-
-    pub {const} fn WTERMSIG(status: ::c_int) -> ::c_int {
-        status & 0x7f
-    }
-
-    pub {const} fn WIFEXITED(status: ::c_int) -> bool {
-        (status & 0x7f) == 0
-    }
-
-    pub {const} fn WEXITSTATUS(status: ::c_int) -> ::c_int {
-        (status >> 8) & 0xff
-    }
-
-    pub {const} fn WCOREDUMP(status: ::c_int) -> bool {
-        (status & 0x80) != 0
-    }
-
-    pub {const} fn W_EXITCODE(ret: ::c_int, sig: ::c_int) -> ::c_int {
-        (ret << 8) | sig
-    }
-
-    pub {const} fn W_STOPCODE(sig: ::c_int) -> ::c_int {
-        (sig << 8) | 0x7f
-    }
-
-    pub {const} fn QCMD(cmd: ::c_int, type_: ::c_int) -> ::c_int {
-        (cmd << 8) | (type_ & 0x00ff)
-    }
-
-    pub {const} fn IPOPT_COPIED(o: u8) -> u8 {
-        o & IPOPT_COPY
-    }
-
-    pub {const} fn IPOPT_CLASS(o: u8) -> u8 {
-        o & IPOPT_CLASS_MASK
-    }
-
-    pub {const} fn IPOPT_NUMBER(o: u8) -> u8 {
-        o & IPOPT_NUMBER_MASK
-    }
-
-    pub {const} fn IPTOS_ECN(x: u8) -> u8 {
-        x & ::IPTOS_ECN_MASK
-    }
-
-    #[allow(ellipsis_inclusive_range_patterns)]
-    pub {const} fn KERNEL_VERSION(a: u32, b: u32, c: u32) -> u32 {
-        ((a << 16) + (b << 8)) + match c {
-            0 ... 255 => c,
-            _ => 255,
-        }
-    }
-}
-
-extern "C" {
-    #[doc(hidden)]
-    pub fn __libc_current_sigrtmax() -> ::c_int;
-    #[doc(hidden)]
-    pub fn __libc_current_sigrtmin() -> ::c_int;
-
-    pub fn sem_destroy(sem: *mut sem_t) -> ::c_int;
-    pub fn sem_init(sem: *mut sem_t, pshared: ::c_int, value: ::c_uint) -> ::c_int;
-    pub fn fdatasync(fd: ::c_int) -> ::c_int;
-    pub fn mincore(addr: *mut ::c_void, len: ::size_t, vec: *mut ::c_uchar) -> ::c_int;
-
-    pub fn clock_getres(clk_id: ::clockid_t, tp: *mut ::timespec) -> ::c_int;
-    pub fn clock_gettime(clk_id: ::clockid_t, tp: *mut ::timespec) -> ::c_int;
-    pub fn clock_settime(clk_id: ::clockid_t, tp: *const ::timespec) -> ::c_int;
-    pub fn clock_getcpuclockid(pid: ::pid_t, clk_id: *mut ::clockid_t) -> ::c_int;
-
-    pub fn dirfd(dirp: *mut ::DIR) -> ::c_int;
-
-    pub fn pthread_getattr_np(native: ::pthread_t, attr: *mut ::pthread_attr_t) -> ::c_int;
-    pub fn pthread_attr_getstack(
-        attr: *const ::pthread_attr_t,
-        stackaddr: *mut *mut ::c_void,
-        stacksize: *mut ::size_t,
-    ) -> ::c_int;
-    pub fn memalign(align: ::size_t, size: ::size_t) -> *mut ::c_void;
-    pub fn setgroups(ngroups: ::size_t, ptr: *const ::gid_t) -> ::c_int;
-    pub fn pipe2(fds: *mut ::c_int, flags: ::c_int) -> ::c_int;
-    pub fn statfs(path: *const ::c_char, buf: *mut statfs) -> ::c_int;
-    pub fn fstatfs(fd: ::c_int, buf: *mut statfs) -> ::c_int;
-    pub fn memrchr(cx: *const ::c_void, c: ::c_int, n: ::size_t) -> *mut ::c_void;
-    pub fn posix_fadvise(fd: ::c_int, offset: ::off_t, len: ::off_t, advise: ::c_int) -> ::c_int;
-    pub fn futimens(fd: ::c_int, times: *const ::timespec) -> ::c_int;
-    pub fn utimensat(
-        dirfd: ::c_int,
-        path: *const ::c_char,
-        times: *const ::timespec,
-        flag: ::c_int,
-    ) -> ::c_int;
-    pub fn duplocale(base: ::locale_t) -> ::locale_t;
-    pub fn freelocale(loc: ::locale_t);
-    pub fn newlocale(mask: ::c_int, locale: *const ::c_char, base: ::locale_t) -> ::locale_t;
-    pub fn uselocale(loc: ::locale_t) -> ::locale_t;
-    pub fn mknodat(
-        dirfd: ::c_int,
-        pathname: *const ::c_char,
-        mode: ::mode_t,
-        dev: dev_t,
-    ) -> ::c_int;
-    pub fn pthread_condattr_getclock(
-        attr: *const pthread_condattr_t,
-        clock_id: *mut clockid_t,
-    ) -> ::c_int;
-    pub fn pthread_condattr_setclock(
-        attr: *mut pthread_condattr_t,
-        clock_id: ::clockid_t,
-    ) -> ::c_int;
-    pub fn pthread_condattr_setpshared(attr: *mut pthread_condattr_t, pshared: ::c_int) -> ::c_int;
-    pub fn pthread_mutexattr_setpshared(
-        attr: *mut pthread_mutexattr_t,
-        pshared: ::c_int,
-    ) -> ::c_int;
-    pub fn pthread_rwlockattr_getpshared(
-        attr: *const pthread_rwlockattr_t,
-        val: *mut ::c_int,
-    ) -> ::c_int;
-    pub fn pthread_rwlockattr_setpshared(attr: *mut pthread_rwlockattr_t, val: ::c_int) -> ::c_int;
-    pub fn ptsname_r(fd: ::c_int, buf: *mut ::c_char, buflen: ::size_t) -> ::c_int;
-    pub fn clearenv() -> ::c_int;
-    pub fn waitid(idtype: idtype_t, id: id_t, infop: *mut ::siginfo_t, options: ::c_int)
-        -> ::c_int;
-    pub fn getresuid(ruid: *mut ::uid_t, euid: *mut ::uid_t, suid: *mut ::uid_t) -> ::c_int;
-    pub fn getresgid(rgid: *mut ::gid_t, egid: *mut ::gid_t, sgid: *mut ::gid_t) -> ::c_int;
-    pub fn acct(filename: *const ::c_char) -> ::c_int;
-    pub fn brk(addr: *mut ::c_void) -> ::c_int;
-    pub fn sbrk(increment: ::intptr_t) -> *mut ::c_void;
-    #[deprecated(
-        since = "0.2.66",
-        note = "causes memory corruption, see rust-lang/libc#1596"
-    )]
-    pub fn vfork() -> ::pid_t;
-    pub fn setresgid(rgid: ::gid_t, egid: ::gid_t, sgid: ::gid_t) -> ::c_int;
-    pub fn setresuid(ruid: ::uid_t, euid: ::uid_t, suid: ::uid_t) -> ::c_int;
-    pub fn wait4(
-        pid: ::pid_t,
-        status: *mut ::c_int,
-        options: ::c_int,
-        rusage: *mut ::rusage,
-    ) -> ::pid_t;
-    pub fn login_tty(fd: ::c_int) -> ::c_int;
-    pub fn execvpe(
-        file: *const ::c_char,
-        argv: *const *const ::c_char,
-        envp: *const *const ::c_char,
-    ) -> ::c_int;
-    pub fn fexecve(
-        fd: ::c_int,
-        argv: *const *const ::c_char,
-        envp: *const *const ::c_char,
-    ) -> ::c_int;
-    pub fn getifaddrs(ifap: *mut *mut ::ifaddrs) -> ::c_int;
-    pub fn freeifaddrs(ifa: *mut ::ifaddrs);
-    pub fn bind(socket: ::c_int, address: *const ::sockaddr, address_len: ::socklen_t) -> ::c_int;
-
-    pub fn writev(fd: ::c_int, iov: *const ::iovec, iovcnt: ::c_int) -> ::ssize_t;
-    pub fn readv(fd: ::c_int, iov: *const ::iovec, iovcnt: ::c_int) -> ::ssize_t;
-
-    pub fn sendmsg(fd: ::c_int, msg: *const ::msghdr, flags: ::c_int) -> ::ssize_t;
-    pub fn recvmsg(fd: ::c_int, msg: *mut ::msghdr, flags: ::c_int) -> ::ssize_t;
-    pub fn uname(buf: *mut ::utsname) -> ::c_int;
-
-    pub fn strchrnul(s: *const ::c_char, c: ::c_int) -> *mut ::c_char;
-}
-
-// LFS64 extensions
-//
-// * musl and Emscripten has 64-bit versions only so aliases the LFS64 symbols to the standard ones
-// * ulibc doesn't have preadv64/pwritev64
-cfg_if! {
-    if #[cfg(not(any(target_env = "musl", target_os = "emscripten")))] {
-        extern "C" {
-            pub fn fstatfs64(fd: ::c_int, buf: *mut statfs64) -> ::c_int;
-            pub fn statvfs64(path: *const ::c_char, buf: *mut statvfs64) -> ::c_int;
-            pub fn fstatvfs64(fd: ::c_int, buf: *mut statvfs64) -> ::c_int;
-            pub fn statfs64(path: *const ::c_char, buf: *mut statfs64) -> ::c_int;
-            pub fn creat64(path: *const c_char, mode: mode_t) -> ::c_int;
-            pub fn fstat64(fildes: ::c_int, buf: *mut stat64) -> ::c_int;
-            pub fn fstatat64(
-                dirfd: ::c_int,
-                pathname: *const c_char,
-                buf: *mut stat64,
-                flags: ::c_int,
-            ) -> ::c_int;
-            pub fn ftruncate64(fd: ::c_int, length: off64_t) -> ::c_int;
-            pub fn lseek64(fd: ::c_int, offset: off64_t, whence: ::c_int) -> off64_t;
-            pub fn lstat64(path: *const c_char, buf: *mut stat64) -> ::c_int;
-            pub fn mmap64(
-                addr: *mut ::c_void,
-                len: ::size_t,
-                prot: ::c_int,
-                flags: ::c_int,
-                fd: ::c_int,
-                offset: off64_t,
-            ) -> *mut ::c_void;
-            pub fn open64(path: *const c_char, oflag: ::c_int, ...) -> ::c_int;
-            pub fn openat64(fd: ::c_int, path: *const c_char, oflag: ::c_int, ...) -> ::c_int;
-            pub fn posix_fadvise64(
-                fd: ::c_int,
-                offset: ::off64_t,
-                len: ::off64_t,
-                advise: ::c_int,
-            ) -> ::c_int;
-            pub fn pread64(
-                fd: ::c_int,
-                buf: *mut ::c_void,
-                count: ::size_t,
-                offset: off64_t
-            ) -> ::ssize_t;
-            pub fn pwrite64(
-                fd: ::c_int,
-                buf: *const ::c_void,
-                count: ::size_t,
-                offset: off64_t,
-            ) -> ::ssize_t;
-            pub fn readdir64(dirp: *mut ::DIR) -> *mut ::dirent64;
-            pub fn readdir64_r(
-                dirp: *mut ::DIR,
-                entry: *mut ::dirent64,
-                result: *mut *mut ::dirent64,
-            ) -> ::c_int;
-            pub fn stat64(path: *const c_char, buf: *mut stat64) -> ::c_int;
-            pub fn truncate64(path: *const c_char, length: off64_t) -> ::c_int;
-        }
-    }
-}
-
-cfg_if! {
-    if #[cfg(not(any(target_env = "uclibc", target_env = "musl", target_os = "emscripten")))] {
-        extern "C" {
-            pub fn preadv64(
-                fd: ::c_int,
-                iov: *const ::iovec,
-                iovcnt: ::c_int,
-                offset: ::off64_t,
-            ) -> ::ssize_t;
-            pub fn pwritev64(
-                fd: ::c_int,
-                iov: *const ::iovec,
-                iovcnt: ::c_int,
-                offset: ::off64_t,
-            ) -> ::ssize_t;
-        }
-    }
-}
-
-cfg_if! {
-    if #[cfg(not(target_env = "uclibc"))] {
-        extern "C" {
-            // uclibc has separate non-const version of this function
-            pub fn forkpty(
-                amaster: *mut ::c_int,
-                name: *mut ::c_char,
-                termp: *const termios,
-                winp: *const ::winsize,
-            ) -> ::pid_t;
-            // uclibc has separate non-const version of this function
-            pub fn openpty(
-                amaster: *mut ::c_int,
-                aslave: *mut ::c_int,
-                name: *mut ::c_char,
-                termp: *const termios,
-                winp: *const ::winsize,
-            ) -> ::c_int;
-        }
-    }
-}
-
-cfg_if! {
-    if #[cfg(target_os = "emscripten")] {
-        mod emscripten;
-        pub use self::emscripten::*;
-    } else if #[cfg(target_os = "linux")] {
-        mod linux;
-        pub use self::linux::*;
-    } else if #[cfg(target_os = "l4re")] {
-        mod linux;
-        pub use self::linux::*;
-    } else if #[cfg(target_os = "android")] {
-        mod android;
-        pub use self::android::*;
-    } else {
-        // Unknown target_os
-    }
-}
+mod linux;
+pub use self::linux::*;

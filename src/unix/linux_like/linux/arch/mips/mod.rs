@@ -193,40 +193,23 @@ pub const BLKIOOPT: ::Ioctl = 0x20001279;
 pub const BLKSSZGET: ::Ioctl = 0x20001268;
 pub const BLKPBSZGET: ::Ioctl = 0x2000127B;
 
-cfg_if! {
-    // Those type are constructed using the _IOC macro
-    // DD-SS_SSSS_SSSS_SSSS-TTTT_TTTT-NNNN_NNNN
-    // where D stands for direction (either None (00), Read (01) or Write (11))
-    // where S stands for size (int, long, struct...)
-    // where T stands for type ('f','v','X'...)
-    // where N stands for NR (NumbeR)
-    if #[cfg(target_arch = "mips")] {
-        pub const FS_IOC_GETFLAGS: ::Ioctl = 0x40046601;
-        pub const FS_IOC_SETFLAGS: ::Ioctl = 0x80046602;
-        pub const FS_IOC_GETVERSION: ::Ioctl = 0x40047601;
-        pub const FS_IOC_SETVERSION: ::Ioctl = 0x80047602;
-        pub const FS_IOC32_GETFLAGS: ::Ioctl = 0x40046601;
-        pub const FS_IOC32_SETFLAGS: ::Ioctl = 0x80046602;
-        pub const FS_IOC32_GETVERSION: ::Ioctl = 0x40047601;
-        pub const FS_IOC32_SETVERSION: ::Ioctl = 0x80047602;
-    } else if #[cfg(target_arch = "mips64")] {
-        pub const FS_IOC_GETFLAGS: ::Ioctl = 0x40086601;
-        pub const FS_IOC_SETFLAGS: ::Ioctl = 0x80086602;
-        pub const FS_IOC_GETVERSION: ::Ioctl = 0x40087601;
-        pub const FS_IOC_SETVERSION: ::Ioctl = 0x80087602;
-        pub const FS_IOC32_GETFLAGS: ::Ioctl = 0x40046601;
-        pub const FS_IOC32_SETFLAGS: ::Ioctl = 0x80046602;
-        pub const FS_IOC32_GETVERSION: ::Ioctl = 0x40047601;
-        pub const FS_IOC32_SETVERSION: ::Ioctl = 0x80047602;
-    }
-}
+// Those type are constructed using the _IOC macro
+// DD-SS_SSSS_SSSS_SSSS-TTTT_TTTT-NNNN_NNNN
+// where D stands for direction (either None (00), Read (01) or Write (11))
+// where S stands for size (int, long, struct...)
+// where T stands for type ('f','v','X'...)
+// where N stands for NR (NumbeR)
+pub const FS_IOC_GETFLAGS: ::Ioctl = 0x40046601;
+pub const FS_IOC_SETFLAGS: ::Ioctl = 0x80046602;
+pub const FS_IOC_GETVERSION: ::Ioctl = 0x40047601;
+pub const FS_IOC_SETVERSION: ::Ioctl = 0x80047602;
+pub const FS_IOC32_GETFLAGS: ::Ioctl = 0x40046601;
+pub const FS_IOC32_SETFLAGS: ::Ioctl = 0x80046602;
+pub const FS_IOC32_GETVERSION: ::Ioctl = 0x40047601;
+pub const FS_IOC32_SETVERSION: ::Ioctl = 0x80047602;
 
-cfg_if! {
-    if #[cfg(target_env = "musl")] {
-        pub const TIOCGRS485: ::Ioctl = 0x4020542e;
-        pub const TIOCSRS485: ::Ioctl = 0xc020542f;
-    }
-}
+pub const TIOCGRS485: ::Ioctl = 0x4020542e;
+pub const TIOCSRS485: ::Ioctl = 0xc020542f;
 
 pub const TIOCM_LE: ::c_int = 0x001;
 pub const TIOCM_DTR: ::c_int = 0x002;
@@ -245,79 +228,25 @@ pub const IBSHIFT: ::tcflag_t = 16;
 
 // RLIMIT Constants
 
-cfg_if! {
-    if #[cfg(any(target_env = "gnu",
-                 target_env = "uclibc"))] {
-
-        pub const RLIMIT_CPU: ::__rlimit_resource_t = 0;
-        pub const RLIMIT_FSIZE: ::__rlimit_resource_t = 1;
-        pub const RLIMIT_DATA: ::__rlimit_resource_t = 2;
-        pub const RLIMIT_STACK: ::__rlimit_resource_t = 3;
-        pub const RLIMIT_CORE: ::__rlimit_resource_t = 4;
-        pub const RLIMIT_NOFILE: ::__rlimit_resource_t = 5;
-        pub const RLIMIT_AS: ::__rlimit_resource_t = 6;
-        pub const RLIMIT_RSS: ::__rlimit_resource_t = 7;
-        pub const RLIMIT_NPROC: ::__rlimit_resource_t = 8;
-        pub const RLIMIT_MEMLOCK: ::__rlimit_resource_t = 9;
-        pub const RLIMIT_LOCKS: ::__rlimit_resource_t = 10;
-        pub const RLIMIT_SIGPENDING: ::__rlimit_resource_t = 11;
-        pub const RLIMIT_MSGQUEUE: ::__rlimit_resource_t = 12;
-        pub const RLIMIT_NICE: ::__rlimit_resource_t = 13;
-        pub const RLIMIT_RTPRIO: ::__rlimit_resource_t = 14;
-        pub const RLIMIT_RTTIME: ::__rlimit_resource_t = 15;
-        #[allow(deprecated)]
-        #[deprecated(since = "0.2.64", note = "Not stable across OS versions")]
-        pub const RLIMIT_NLIMITS: ::__rlimit_resource_t = RLIM_NLIMITS;
-
-    } else if #[cfg(target_env = "musl")] {
-
-        pub const RLIMIT_CPU: ::c_int = 0;
-        pub const RLIMIT_FSIZE: ::c_int = 1;
-        pub const RLIMIT_DATA: ::c_int = 2;
-        pub const RLIMIT_STACK: ::c_int = 3;
-        pub const RLIMIT_CORE: ::c_int = 4;
-        pub const RLIMIT_NOFILE: ::c_int = 5;
-        pub const RLIMIT_AS: ::c_int = 6;
-        pub const RLIMIT_RSS: ::c_int = 7;
-        pub const RLIMIT_NPROC: ::c_int = 8;
-        pub const RLIMIT_MEMLOCK: ::c_int = 9;
-        pub const RLIMIT_LOCKS: ::c_int = 10;
-        pub const RLIMIT_SIGPENDING: ::c_int = 11;
-        pub const RLIMIT_MSGQUEUE: ::c_int = 12;
-        pub const RLIMIT_NICE: ::c_int = 13;
-        pub const RLIMIT_RTPRIO: ::c_int = 14;
-        pub const RLIMIT_RTTIME: ::c_int = 15;
-        #[deprecated(since = "0.2.64", note = "Not stable across OS versions")]
-        pub const RLIM_NLIMITS: ::c_int = 15;
-        #[allow(deprecated)]
-        #[deprecated(since = "0.2.64", note = "Not stable across OS versions")]
-        pub const RLIMIT_NLIMITS: ::c_int = RLIM_NLIMITS;
-        pub const RLIM_INFINITY: ::rlim_t = !0;
-    }
-}
-
-cfg_if! {
-    if #[cfg(target_env = "gnu")] {
-        #[deprecated(since = "0.2.64", note = "Not stable across OS versions")]
-        pub const RLIM_NLIMITS: ::__rlimit_resource_t = 16;
-    } else if #[cfg(target_env = "uclibc")] {
-        #[deprecated(since = "0.2.64", note = "Not stable across OS versions")]
-        pub const RLIM_NLIMITS: ::__rlimit_resource_t = 15;
-    }
-}
-
-cfg_if! {
-    if #[cfg(any(target_arch = "mips64", target_arch = "mips64r6"),
-         any(target_env = "gnu",
-             target_env = "uclibc"))] {
-        pub const RLIM_INFINITY: ::rlim_t = !0;
-    }
-}
-
-cfg_if! {
-    if #[cfg(any(target_arch = "mips", target_arch = "mips32r6"),
-         any(target_env = "gnu",
-             target_env = "uclibc"))] {
-        pub const RLIM_INFINITY: ::rlim_t = 0x7fffffff;
-    }
-}
+pub const RLIMIT_CPU: ::c_int = 0;
+pub const RLIMIT_FSIZE: ::c_int = 1;
+pub const RLIMIT_DATA: ::c_int = 2;
+pub const RLIMIT_STACK: ::c_int = 3;
+pub const RLIMIT_CORE: ::c_int = 4;
+pub const RLIMIT_NOFILE: ::c_int = 5;
+pub const RLIMIT_AS: ::c_int = 6;
+pub const RLIMIT_RSS: ::c_int = 7;
+pub const RLIMIT_NPROC: ::c_int = 8;
+pub const RLIMIT_MEMLOCK: ::c_int = 9;
+pub const RLIMIT_LOCKS: ::c_int = 10;
+pub const RLIMIT_SIGPENDING: ::c_int = 11;
+pub const RLIMIT_MSGQUEUE: ::c_int = 12;
+pub const RLIMIT_NICE: ::c_int = 13;
+pub const RLIMIT_RTPRIO: ::c_int = 14;
+pub const RLIMIT_RTTIME: ::c_int = 15;
+#[deprecated(since = "0.2.64", note = "Not stable across OS versions")]
+pub const RLIM_NLIMITS: ::c_int = 15;
+#[allow(deprecated)]
+#[deprecated(since = "0.2.64", note = "Not stable across OS versions")]
+pub const RLIMIT_NLIMITS: ::c_int = RLIM_NLIMITS;
+pub const RLIM_INFINITY: ::rlim_t = !0;

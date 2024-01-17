@@ -1,4 +1,4 @@
-pub type pthread_t = *mut ::c_void;
+pub type pthread_t = u32; //*mut ::c_void;
 pub type clock_t = c_long;
 #[cfg_attr(
     not(feature = "rustc-dep-of-std"),
@@ -32,32 +32,6 @@ cfg_if! {
     }
 }
 
-impl siginfo_t {
-    pub unsafe fn si_addr(&self) -> *mut ::c_void {
-        #[repr(C)]
-        struct siginfo_sigfault {
-            _si_signo: ::c_int,
-            _si_errno: ::c_int,
-            _si_code: ::c_int,
-            si_addr: *mut ::c_void,
-        }
-        (*(self as *const siginfo_t as *const siginfo_sigfault)).si_addr
-    }
-
-    pub unsafe fn si_value(&self) -> ::sigval {
-        #[repr(C)]
-        struct siginfo_si_value {
-            _si_signo: ::c_int,
-            _si_errno: ::c_int,
-            _si_code: ::c_int,
-            _si_timerid: ::c_int,
-            _si_overrun: ::c_int,
-            si_value: ::sigval,
-        }
-        (*(self as *const siginfo_t as *const siginfo_si_value)).si_value
-    }
-}
-
 // Internal, for casts to access union fields
 #[repr(C)]
 struct sifields_sigchld {
@@ -77,7 +51,7 @@ impl ::Clone for sifields_sigchld {
 // Internal, for casts to access union fields
 #[repr(C)]
 union sifields {
-    _align_pointer: *mut ::c_void,
+    _align_pointer: u32, //*mut ::c_void,
     sigchld: sifields_sigchld,
 }
 
@@ -90,51 +64,22 @@ struct siginfo_f {
     sifields: sifields,
 }
 
-impl siginfo_t {
-    unsafe fn sifields(&self) -> &sifields {
-        &(*(self as *const siginfo_t as *const siginfo_f)).sifields
-    }
-
-    pub unsafe fn si_pid(&self) -> ::pid_t {
-        self.sifields().sigchld.si_pid
-    }
-
-    pub unsafe fn si_uid(&self) -> ::uid_t {
-        self.sifields().sigchld.si_uid
-    }
-
-    pub unsafe fn si_status(&self) -> ::c_int {
-        self.sifields().sigchld.si_status
-    }
-
-    pub unsafe fn si_utime(&self) -> ::c_long {
-        self.sifields().sigchld.si_utime
-    }
-
-    pub unsafe fn si_stime(&self) -> ::c_long {
-        self.sifields().sigchld.si_stime
-    }
-}
-
 s! {
     pub struct aiocb {
         pub aio_fildes: ::c_int,
         pub aio_lio_opcode: ::c_int,
         pub aio_reqprio: ::c_int,
-        pub aio_buf: *mut ::c_void,
+        pub aio_buf: u32, //*mut ::c_void,
         pub aio_nbytes: ::size_t,
         pub aio_sigevent: ::sigevent,
-        __td: *mut ::c_void,
+        __td: u32, //*mut ::c_void,
         __lock: [::c_int; 2],
         __err: ::c_int,
         __ret: ::ssize_t,
         pub aio_offset: off_t,
-        __next: *mut ::c_void,
-        __prev: *mut ::c_void,
-        #[cfg(target_pointer_width = "32")]
+        __next: u32, //*mut ::c_void,
+        __prev: u32, //*mut ::c_void,
         __dummy4: [::c_char; 24],
-        #[cfg(target_pointer_width = "64")]
-        __dummy4: [::c_char; 16],
     }
 
     pub struct sigaction {
@@ -153,11 +98,7 @@ s! {
         pub f_files: ::fsfilcnt_t,
         pub f_ffree: ::fsfilcnt_t,
         pub f_favail: ::fsfilcnt_t,
-        #[cfg(target_endian = "little")]
-        pub f_fsid: ::c_ulong,
-        #[cfg(target_pointer_width = "32")]
         __f_unused: ::c_int,
-        #[cfg(target_endian = "big")]
         pub f_fsid: ::c_ulong,
         pub f_flag: ::c_ulong,
         pub f_namemax: ::c_ulong,
@@ -193,8 +134,8 @@ s! {
 
     pub struct regex_t {
         __re_nsub: ::size_t,
-        __opaque: *mut ::c_void,
-        __padding: [*mut ::c_void; 4usize],
+        __opaque: u32, //*mut ::c_void,
+        __padding: [u32; 4usize], //*mut ::c_void; 4usize],
         __nsub2: ::size_t,
         __padding2: ::c_char,
     }
@@ -209,12 +150,9 @@ s! {
         pub rt_pad3: ::c_ulong,
         pub rt_tos: ::c_uchar,
         pub rt_class: ::c_uchar,
-        #[cfg(target_pointer_width = "64")]
-        pub rt_pad4: [::c_short; 3usize],
-        #[cfg(not(target_pointer_width = "64"))]
         pub rt_pad4: [::c_short; 1usize],
         pub rt_metric: ::c_short,
-        pub rt_dev: *mut ::c_char,
+        pub rt_dev: u32, //*mut ::c_char,
         pub rt_mtu: ::c_ulong,
         pub rt_window: ::c_ulong,
         pub rt_irtt: ::c_ushort,
@@ -381,22 +319,7 @@ s_no_extra_traits! {
         pub ut_host: [::c_char; 256],
         pub ut_exit: __exit_status,
 
-        #[cfg(target_env = "musl")]
         pub ut_session: ::c_long,
-
-        #[cfg(target_env = "ohos")]
-        #[cfg(target_endian = "little")]
-        pub ut_session: ::c_int,
-        #[cfg(target_env = "ohos")]
-        #[cfg(target_endian = "little")]
-        __ut_pad2: ::c_int,
-
-        #[cfg(target_env = "ohos")]
-        #[cfg(not(target_endian = "little"))]
-        __ut_pad2: ::c_int,
-        #[cfg(target_env = "ohos")]
-        #[cfg(not(target_endian = "little"))]
-        pub ut_session: ::c_int,
 
         pub ut_tv: ::timeval,
         pub ut_addr_v6: [::c_uint; 4],
@@ -820,111 +743,9 @@ cfg_if! {
     }
 }
 
-extern "C" {
-    pub fn sendmmsg(
-        sockfd: ::c_int,
-        msgvec: *mut ::mmsghdr,
-        vlen: ::c_uint,
-        flags: ::c_uint,
-    ) -> ::c_int;
-    pub fn recvmmsg(
-        sockfd: ::c_int,
-        msgvec: *mut ::mmsghdr,
-        vlen: ::c_uint,
-        flags: ::c_uint,
-        timeout: *mut ::timespec,
-    ) -> ::c_int;
-
-    pub fn getrlimit(resource: ::c_int, rlim: *mut ::rlimit) -> ::c_int;
-    pub fn setrlimit(resource: ::c_int, rlim: *const ::rlimit) -> ::c_int;
-    pub fn prlimit(
-        pid: ::pid_t,
-        resource: ::c_int,
-        new_limit: *const ::rlimit,
-        old_limit: *mut ::rlimit,
-    ) -> ::c_int;
-    pub fn ioctl(fd: ::c_int, request: ::c_int, ...) -> ::c_int;
-    pub fn gettimeofday(tp: *mut ::timeval, tz: *mut ::c_void) -> ::c_int;
-    pub fn ptrace(request: ::c_int, ...) -> ::c_long;
-    pub fn getpriority(which: ::c_int, who: ::id_t) -> ::c_int;
-    pub fn setpriority(which: ::c_int, who: ::id_t, prio: ::c_int) -> ::c_int;
-    // Musl targets need the `mask` argument of `fanotify_mark` be specified
-    // `::c_ulonglong` instead of `u64` or there will be a type mismatch between
-    // `long long unsigned int` and the expected `uint64_t`.
-    pub fn fanotify_mark(
-        fd: ::c_int,
-        flags: ::c_uint,
-        mask: ::c_ulonglong,
-        dirfd: ::c_int,
-        path: *const ::c_char,
-    ) -> ::c_int;
-    pub fn getauxval(type_: ::c_ulong) -> ::c_ulong;
-
-    // Added in `musl` 1.1.20
-    pub fn explicit_bzero(s: *mut ::c_void, len: ::size_t);
-    // Added in `musl` 1.2.2
-    pub fn reallocarray(ptr: *mut ::c_void, nmemb: ::size_t, size: ::size_t) -> *mut ::c_void;
-
-    pub fn adjtimex(buf: *mut ::timex) -> ::c_int;
-    pub fn clock_adjtime(clk_id: ::clockid_t, buf: *mut ::timex) -> ::c_int;
-
-    pub fn ctermid(s: *mut ::c_char) -> *mut ::c_char;
-
-    pub fn memfd_create(name: *const ::c_char, flags: ::c_uint) -> ::c_int;
-    pub fn mlock2(addr: *const ::c_void, len: ::size_t, flags: ::c_uint) -> ::c_int;
-    pub fn malloc_usable_size(ptr: *mut ::c_void) -> ::size_t;
-
-    pub fn euidaccess(pathname: *const ::c_char, mode: ::c_int) -> ::c_int;
-    pub fn eaccess(pathname: *const ::c_char, mode: ::c_int) -> ::c_int;
-
-    pub fn asctime_r(tm: *const ::tm, buf: *mut ::c_char) -> *mut ::c_char;
-
-    pub fn strftime(
-        s: *mut ::c_char,
-        max: ::size_t,
-        format: *const ::c_char,
-        tm: *const ::tm,
-    ) -> ::size_t;
-    pub fn strftime_l(
-        s: *mut ::c_char,
-        max: ::size_t,
-        format: *const ::c_char,
-        tm: *const ::tm,
-        locale: ::locale_t,
-    ) -> ::size_t;
-    pub fn strptime(s: *const ::c_char, format: *const ::c_char, tm: *mut ::tm) -> *mut ::c_char;
-
-    pub fn dirname(path: *mut ::c_char) -> *mut ::c_char;
-    pub fn basename(path: *mut ::c_char) -> *mut ::c_char;
-
-    pub fn getutxent() -> *mut utmpx;
-    pub fn getutxid(ut: *const utmpx) -> *mut utmpx;
-    pub fn getutxline(ut: *const utmpx) -> *mut utmpx;
-    pub fn pututxline(ut: *const utmpx) -> *mut utmpx;
-    pub fn setutxent();
-    pub fn endutxent();
-}
-
 // Alias <foo> to <foo>64 to mimic glibc's LFS64 support
-mod lfs64;
-pub use self::lfs64::*;
+//mod lfs64;
+//pub use self::lfs64::*;
 
-cfg_if! {
-    if #[cfg(any(target_arch = "x86_64",
-                 target_arch = "aarch64",
-                 target_arch = "mips64",
-                 target_arch = "powerpc64",
-                 target_arch = "s390x",
-                 target_arch = "riscv64"))] {
-        mod b64;
-        pub use self::b64::*;
-    } else if #[cfg(any(target_arch = "x86",
-                        target_arch = "mips",
-                        target_arch = "powerpc",
-                        target_arch = "hexagon",
-                        target_arch = "riscv32",
-                        target_arch = "arm"))] {
-        mod b32;
-        pub use self::b32::*;
-    } else { }
-}
+mod b32;
+pub use self::b32::*;

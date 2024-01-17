@@ -49,7 +49,7 @@ s! {
     }
 
     pub struct stack_t {
-        pub ss_sp: *mut ::c_void,
+        pub ss_sp: u32, //*mut ::c_void,
         pub ss_size: ::size_t,
         pub ss_flags: ::c_int,
     }
@@ -81,21 +81,12 @@ s! {
 
     pub struct msqid_ds {
         pub msg_perm: ::ipc_perm,
-        #[cfg(target_endian = "big")]
         __unused1: ::c_int,
         pub msg_stime: ::time_t,
-        #[cfg(target_endian = "little")]
-        __unused1: ::c_int,
-        #[cfg(target_endian = "big")]
         __unused2: ::c_int,
         pub msg_rtime: ::time_t,
-        #[cfg(target_endian = "little")]
-        __unused2: ::c_int,
-        #[cfg(target_endian = "big")]
         __unused3: ::c_int,
         pub msg_ctime: ::time_t,
-        #[cfg(target_endian = "little")]
-        __unused3: ::c_int,
         __msg_cbytes: ::c_ulong,
         pub msg_qnum: ::msgqnum_t,
         pub msg_qbytes: ::msglen_t,
@@ -152,10 +143,7 @@ s! {
         pub f_files: u64,
         pub f_ffree: u64,
         pub f_favail: u64,
-        #[cfg(target_endian = "little")]
-        pub f_fsid: ::c_ulong,
         __f_unused: ::c_int,
-        #[cfg(target_endian = "big")]
         pub f_fsid: ::c_ulong,
         pub f_flag: ::c_ulong,
         pub f_namemax: ::c_ulong,

@@ -1,5 +1,5 @@
 //! libc - Raw FFI bindings to platforms' system libraries
-#![crate_name = "libc"]
+#![crate_name = "libc_mips"]
 #![crate_type = "rlib"]
 #![allow(
     renamed_and_removed_lints, // Keep this order.
@@ -58,74 +58,8 @@ use core::num;
 #[allow(unused_imports)]
 use core::option::Option;
 
-cfg_if! {
-    if #[cfg(windows)] {
-        mod fixed_width_ints;
-        pub use fixed_width_ints::*;
+mod fixed_width_ints;
+pub use fixed_width_ints::*;
 
-        mod windows;
-        pub use windows::*;
-    } else if #[cfg(target_os = "fuchsia")] {
-        mod fixed_width_ints;
-        pub use fixed_width_ints::*;
-
-        mod fuchsia;
-        pub use fuchsia::*;
-    } else if #[cfg(target_os = "switch")] {
-        mod fixed_width_ints;
-        pub use fixed_width_ints::*;
-
-        mod switch;
-        pub use switch::*;
-    } else if #[cfg(target_os = "vxworks")] {
-        mod fixed_width_ints;
-        pub use fixed_width_ints::*;
-
-        mod vxworks;
-        pub use vxworks::*;
-    } else if #[cfg(target_os = "solid_asp3")] {
-        mod fixed_width_ints;
-        pub use fixed_width_ints::*;
-
-        mod solid;
-        pub use solid::*;
-    } else if #[cfg(unix)] {
-        mod fixed_width_ints;
-        pub use fixed_width_ints::*;
-
-        mod unix;
-        pub use unix::*;
-    } else if #[cfg(target_os = "hermit")] {
-        mod fixed_width_ints;
-        pub use fixed_width_ints::*;
-
-        mod hermit;
-        pub use hermit::*;
-    } else if #[cfg(target_os = "teeos")] {
-        mod fixed_width_ints;
-        pub use fixed_width_ints::*;
-
-        mod teeos;
-        pub use teeos::*;
-    } else if #[cfg(all(target_env = "sgx", target_vendor = "fortanix"))] {
-        mod fixed_width_ints;
-        pub use fixed_width_ints::*;
-
-        mod sgx;
-        pub use sgx::*;
-    } else if #[cfg(any(target_env = "wasi", target_os = "wasi"))] {
-        mod fixed_width_ints;
-        pub use fixed_width_ints::*;
-
-        mod wasi;
-        pub use wasi::*;
-    } else if #[cfg(target_os = "xous")] {
-        mod fixed_width_ints;
-        pub use fixed_width_ints::*;
-
-        mod xous;
-        pub use xous::*;
-    } else {
-        // non-supported targets: empty...
-    }
-}
+mod unix;
+pub use unix::*;

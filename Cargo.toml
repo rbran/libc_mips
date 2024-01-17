@@ -1,5 +1,5 @@
 [package]
-name = "libc"
+name = "libc_mips"
 version = "0.2.151"
 authors = ["The Rust Project Developers"]
 license = "MIT OR Apache-2.0"
@@ -140,6 +140,3 @@ align = []
 rustc-dep-of-std = ['align', 'rustc-std-workspace-core']
 extra_traits = []
 const-extern-fn = []
-
-[workspace]
-members = ["libc-test"]
