@@ -48,22 +48,6 @@ impl ::Clone for sifields_sigchld {
     }
 }
 
-// Internal, for casts to access union fields
-#[repr(C)]
-union sifields {
-    _align_pointer: u32, //*mut ::c_void,
-    sigchld: sifields_sigchld,
-}
-
-// Internal, for casts to access union fields. Note that some variants
-// of sifields start with a pointer, which makes the alignment of
-// sifields vary on 32-bit and 64-bit architectures.
-#[repr(C)]
-struct siginfo_f {
-    _siginfo_base: [::c_int; 3],
-    sifields: sifields,
-}
-
 s! {
     pub struct aiocb {
         pub aio_fildes: ::c_int,
